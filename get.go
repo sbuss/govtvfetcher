@@ -14,7 +14,8 @@ func (r *Resource) Get(start, stop int) ([]byte, error) {
 		return nil, fmt.Errorf("start (%d) > stop (%d)", start, stop)
 	}
 	if stop > r.Length {
-		return nil, fmt.Errorf("stop is larger than filesize: %d > %d", stop, r.Length)
+		log.Printf("stop is larger than filesize: %d > %d", stop, r.Length)
+		stop = r.Length
 	}
 	if start < 0 {
 		return nil, fmt.Errorf("start must be >= 0")
