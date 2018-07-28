@@ -8,7 +8,7 @@ import (
 
 type Resource struct {
 	Uri    string
-	Length int
+	Length uint64
 }
 
 func NewResource(uri string) (*Resource, error) {
@@ -28,9 +28,12 @@ func NewResource(uri string) (*Resource, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid length (%s): %v", length_s, err)
 	}
+	if length < 0 {
+		return nil, fmt.Errorf("length must be >= 0, got %d", length)
+	}
 	r := &Resource{
 		Uri:    uri,
-		Length: length,
+		Length: uint64(length),
 	}
 	return r, nil
 }

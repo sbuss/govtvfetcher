@@ -10,13 +10,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/bytefmt"
 	"github.com/remeh/sizedwaitgroup"
 	"github.com/sbuss/govtvfetcher"
 )
 
 var (
 	keep      = flag.Bool("keep", false, "Keep the temp dir with partial files.")
-	chunksize = flag.Int("chunksize", 16*1024*1024, "Size of video chunks.")
+	chunksize = flag.String("chunksize", "16MB", "Size of video chunks.")
 )
 
 func main() {
@@ -40,23 +41,27 @@ func main() {
 	// d := "/tmp/sanfrancisco_c6d8c565-1eba-41b8-b9c2-f5999a2b141f-190550762"
 	log.Printf("Saving files to %s\n", d)
 
-	num_chunks := (r.Length / *chunksize) + 1
+	chunksize_bytes, err := bytefmt.ToBytes(*chunksize)
+	if err != nil {
+		log.Fatalf("Could not convert '%s' to bytes: %v", *chunksize, err)
+	}
+	num_chunks := (r.Length / chunksize_bytes) + 1
 	log.Printf("splitting into %d chunks\n", num_chunks)
 	wg := sizedwaitgroup.New(20)
 	// Note: the Range header is inclusive on both sides, so two subsequent
 	// requests will return overlapping byte ranges, eg:
 	// GET(0, 16) + GET(16, 32) returns a total of 33 bytes, with the 16th
 	// byte duplicated.
-	for i := 0; i < num_chunks; i++ {
+	for i := uint64(0); i < num_chunks; i++ {
 		wg.Add()
-		go func(i int) {
+		go func(i uint64) {
 			defer wg.Done()
-			start := i * *chunksize
+			start := i * chunksize_bytes
 			if start > r.Length {
 				log.Printf("start > %d\n", r.Length)
 				return
 			}
-			stop := (i+1)*(*chunksize) - 1
+			stop := (i+1)*chunksize_bytes - 1
 			if stop > r.Length {
 				stop = r.Length
 				log.Printf("stop is larger than filesize: %d > %d", stop, r.Length)
@@ -88,7 +93,7 @@ func main() {
 
 	// Write bytes to buffer
 
-	for i := 0; i < num_chunks; i++ {
+	for i := uint64(0); i < num_chunks; i++ {
 		log.Printf("Reading %d\n", i)
 		inf := filepath.Join(d, fmt.Sprintf("%d.mp4", i))
 		data, err := ioutil.ReadFile(inf)

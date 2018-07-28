@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func (r *Resource) Get(start, stop int) ([]byte, error) {
+func (r *Resource) Get(start, stop uint64) ([]byte, error) {
 	log.Printf("Attempting to fetch offset %d-%d\n", start, stop)
 	if start > stop {
 		return nil, fmt.Errorf("start (%d) > stop (%d)", start, stop)
