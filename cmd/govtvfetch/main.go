@@ -23,10 +23,11 @@ var (
 func main() {
 	flag.Parse()
 
-	r, err := govtvfetcher.NewResource("http://media-06.granicus.com:443/OnDemand/sanfrancisco/sanfrancisco_c6d8c565-1eba-41b8-b9c2-f5999a2b141f.mp4")
+	r, err := govtvfetcher.NewResource("http://sanfrancisco.granicus.com/MediaPlayer.php?view_id=10&clip_id=30952")
 	if err != nil {
 		log.Fatalf("Could not create resource: %v\n", err)
 	}
+	fmt.Printf("%v", r)
 
 	parts := strings.Split(r.Uri, "/")
 	fname_full := parts[len(parts)-1]
