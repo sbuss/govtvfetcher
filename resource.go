@@ -24,9 +24,13 @@ func asx(uri string) (string, error) {
 	if clip_id == "" {
 		return "", fmt.Errorf("Could not find clip_id in URI '%s'", uri)
 	}
+	view_id := u.Query().Get("view_id")
+	if view_id == "" {
+		return "", fmt.Errorf("Could not find view_id in URI '%s'", uri)
+	}
 
 	// Now we have clip_id, we can get the media URI
-	infoUri := fmt.Sprintf("http://%s/ASX.php?clip_id=%s", u.Host, clip_id)
+	infoUri := fmt.Sprintf("http://%s/ASX.php?view_id=%s&clip_id=%s", u.Host, view_id, clip_id)
 	resp, err := http.Get(infoUri)
 	if err != nil {
 		return "", fmt.Errorf("couldn't fetch uri (%s): %v", infoUri, err)
