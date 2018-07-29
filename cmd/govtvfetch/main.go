@@ -18,12 +18,14 @@ import (
 var (
 	keep      = flag.Bool("keep", false, "Keep the temp dir with partial files.")
 	chunksize = flag.String("chunksize", "16MB", "Size of video chunks.")
+	uri       = flag.String("uri", "", "URI of the video to download.")
 )
 
 func main() {
 	flag.Parse()
 
-	r, err := govtvfetcher.NewResource("http://sanfrancisco.granicus.com/MediaPlayer.php?view_id=10&clip_id=30952")
+	// r, err := govtvfetcher.NewResource("http://sanfrancisco.granicus.com/MediaPlayer.php?view_id=10&clip_id=30952")
+	r, err := govtvfetcher.NewResource(*uri)
 	if err != nil {
 		log.Fatalf("Could not create resource: %v\n", err)
 	}
