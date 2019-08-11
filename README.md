@@ -1,6 +1,6 @@
 # Install
 
-go install github.com/sbuss/govtvfetcher/cmd/govtvfetch
+go get github.com/sbuss/govtvfetcher/cmd/govtvfetch
 
 
 # Use
