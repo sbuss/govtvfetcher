@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	keep      = flag.Bool("keep", false, "Keep the temp dir with partial files.")
-	chunksize = flag.String("chunksize", "16MB", "Size of video chunks.")
-	uri       = flag.String("uri", "", "URI of the video to download.")
+	keep        = flag.Bool("keep", false, "Keep the temp dir with partial files.")
+	chunksize   = flag.String("chunksize", "16MB", "Size of video chunks.")
+	uri         = flag.String("uri", "", "URI of the video to download.")
+	num_workers = flag.Int("num_workers", 20, "Number of parallel workers.")
 )
 
 func main() {
@@ -50,7 +51,7 @@ func main() {
 	}
 	num_chunks := (r.Length / chunksize_bytes) + 1
 	log.Printf("splitting into %d chunks\n", num_chunks)
-	wg := sizedwaitgroup.New(20)
+	wg := sizedwaitgroup.New(*num_workers)
 	// Note: the Range header is inclusive on both sides, so two subsequent
 	// requests will return overlapping byte ranges, eg:
 	// GET(0, 16) + GET(16, 32) returns a total of 33 bytes, with the 16th
